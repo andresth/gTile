@@ -50,6 +50,8 @@ const SETTINGS_INSETS_SECONDARY_RIGHT = 'insets-secondary-right';
 const SETTINGS_INSETS_SECONDARY_TOP = 'insets-secondary-top';
 const SETTINGS_INSETS_SECONDARY_BOTTOM = 'insets-secondary-bottom';
 const SETTINGS_DEBUG = 'debug';
+const SETTINGS_MAIN_AREA_WIDTH = 'main-area-width';
+const SETTINGS_LIST_AREA_WIDTH = 'list-area-width';
 
 let status;
 let launcher;
@@ -78,11 +80,11 @@ const key_bindings = {
 };
 
 const key_bindings_tiling = {
-    'move-left'       : function() { keyMoveResizeEvent('move'  , 'left' );},    
-    'move-right'      : function() { keyMoveResizeEvent('move'  , 'right');},    
-    'move-up'         : function() { keyMoveResizeEvent('move'  , 'up'   );},    
+    'move-left'       : function() { keyMoveResizeEvent('move'  , 'left' );},
+    'move-right'      : function() { keyMoveResizeEvent('move'  , 'right');},
+    'move-up'         : function() { keyMoveResizeEvent('move'  , 'up'   );},
     'move-down'       : function() { keyMoveResizeEvent('move'  , 'down' );},
-    'resize-left'     : function() { keyMoveResizeEvent('resize', 'left' );},    
+    'resize-left'     : function() { keyMoveResizeEvent('resize', 'left' );},
     'resize-right'    : function() { keyMoveResizeEvent('resize', 'right');},
     'resize-up'       : function() { keyMoveResizeEvent('resize', 'up'   );},
     'resize-down'     : function() { keyMoveResizeEvent('resize', 'down' );},
@@ -173,8 +175,8 @@ const GTileStatusButton = new Lang.Class({
 function parseTuple(format, delimiter) {
     // parsing grid size in format XdelimY, like 6x4 or 1:2
     let gssk = format.split(delimiter);
-    if(gssk.length != 2 
-        || isNaN(gssk[0]) || gssk[0] < 0 || gssk[0] > 40 
+    if(gssk.length != 2
+        || isNaN(gssk[0]) || gssk[0] < 0 || gssk[0] > 40
         || isNaN(gssk[1]) || gssk[1] < 0 || gssk[1] > 40) {
         log("Bad format " + format + ", delimiter " + delimiter);
         return {X: Number(-1), Y: Number(-1)};
@@ -188,7 +190,7 @@ function initGridSizes(grid_sizes) {
         new GridSettingsButton('8x6',8,6),
         new GridSettingsButton('6x4',6,4),
         new GridSettingsButton('4x4',4,4),
-    ];  
+    ];
     let grid_sizes_orig = true;
     let gss = grid_sizes.split(",");
     for (var key in gss) {
@@ -210,17 +212,17 @@ function getBoolSetting (settings_string) {
 	log("Undefined settings " + settings_string);
         gridSettings[settings_string] = false;
     } else {
-        //log(settings_string + " set to " + gridSettings[settings_string]);  
+        //log(settings_string + " set to " + gridSettings[settings_string]);
     }
 }
 
 function getIntSetting (settings_string) {
     let iss = settings.get_int(settings_string);
-    if(iss === undefined) { 
-        log("Undefined settings " + settings_string);  
+    if(iss === undefined) {
+        log("Undefined settings " + settings_string);
         return 0;
     } else {
-        //log(settings_string + " set to " + iss);  
+        //log(settings_string + " set to " + iss);
         return iss;
     }
 }
@@ -237,16 +239,16 @@ function initSettings() {
 
     gridSettings[SETTINGS_WINDOW_MARGIN] = getIntSetting(SETTINGS_WINDOW_MARGIN);
 
-    gridSettings[SETTINGS_INSETS_PRIMARY] = 
-        { top:    getIntSetting(SETTINGS_INSETS_PRIMARY_TOP), 
-        bottom: getIntSetting(SETTINGS_INSETS_PRIMARY_BOTTOM), 
-        left:   getIntSetting(SETTINGS_INSETS_PRIMARY_LEFT), 
+    gridSettings[SETTINGS_INSETS_PRIMARY] =
+        { top:    getIntSetting(SETTINGS_INSETS_PRIMARY_TOP),
+        bottom: getIntSetting(SETTINGS_INSETS_PRIMARY_BOTTOM),
+        left:   getIntSetting(SETTINGS_INSETS_PRIMARY_LEFT),
         right:  getIntSetting(SETTINGS_INSETS_PRIMARY_RIGHT) }; // Insets on primary monitor
-    gridSettings[SETTINGS_INSETS_SECONDARY] = 
-        { top:    getIntSetting(SETTINGS_INSETS_SECONDARY_TOP), 
-        bottom: getIntSetting(SETTINGS_INSETS_SECONDARY_BOTTOM), 
-        left:   getIntSetting(SETTINGS_INSETS_SECONDARY_LEFT), 
-        right:  getIntSetting(SETTINGS_INSETS_SECONDARY_RIGHT) }; 
+    gridSettings[SETTINGS_INSETS_SECONDARY] =
+        { top:    getIntSetting(SETTINGS_INSETS_SECONDARY_TOP),
+        bottom: getIntSetting(SETTINGS_INSETS_SECONDARY_BOTTOM),
+        left:   getIntSetting(SETTINGS_INSETS_SECONDARY_LEFT),
+        right:  getIntSetting(SETTINGS_INSETS_SECONDARY_RIGHT) };
 
     // initialize these from settings, the first set of sizes
     if(nbCols == 0 || nbRows == 0) {
@@ -280,7 +282,7 @@ function enable() {
     area = new St.BoxLayout({style_class: 'grid-preview'});
     Main.uiGroup.add_actor(area);
     initGrids();
-    
+
     log("Create Button");
     launcher = new GTileStatusButton('tiling-icon');
 
@@ -532,7 +534,7 @@ function _onFocus() {
 
     if (window && status) {
         log("_onFocus " + window.get_title());
-        focusMetaWindow = window;	
+        focusMetaWindow = window;
 
         let app = tracker.get_window_app(focusMetaWindow);
         let title = focusMetaWindow.get_title();
@@ -620,7 +622,7 @@ function hideTiling() {
     resetFocusMetaWindow();
 
     launcher.deactivate();
-    status = false;    
+    status = false;
     unbindKeyControls();
 }
 
@@ -705,26 +707,26 @@ function getWorkArea(monitor, monitor_idx) {
     };
 }
 
-function bindKeyControls() {   
+function bindKeyControls() {
     if(!keyControlBound) {
         hotkeys.bind(key_bindings_tiling);
         log("Connect notify:focus-window");
         if(focusConnect) {
             global.display.disconnect(focusConnect);
-        }    
+        }
         focusConnect = global.display.connect('notify::focus-window', Lang.bind(this, _onFocus));
         if(!gridSettings[SETTINGS_GLOBAL_PRESETS]) {
             hotkeys.bind(key_bindings_presets);
-        }	
+        }
         keyControlBound = true;
     }
 }
 
-function unbindKeyControls() {    
+function unbindKeyControls() {
     if(keyControlBound) {
         hotkeys.unbind(key_bindings_tiling);
         if(focusConnect) {
-            log("Disconnect notify:focus-window");        
+            log("Disconnect notify:focus-window");
             global.display.disconnect(focusConnect);
             focusConnect = false;
         }
@@ -776,7 +778,7 @@ function keyChangeTiling() {
     setInitialSelection();
 }
 
-function setInitialSelection() {  
+function setInitialSelection() {
     if (!focusMetaWindow) {
         return;
     }
@@ -793,9 +795,9 @@ function setInitialSelection() {
     let delegate = grid.elementsDelegate;
 
     log("Set initial selection");
-    log("Focus window position x " + wx + " y " + wy + " width " + wwidth + " height " + wheight); 
-    log("Focus monitor position x " + monitor.x + " y " + monitor.y + " width " + monitor.width + " height " + monitor.height); 
-    log("Workarea position x " + workArea.x + " y " + workArea.y + " width " + workArea.width + " height " + workArea.height); 
+    log("Focus window position x " + wx + " y " + wy + " width " + wwidth + " height " + wheight);
+    log("Focus monitor position x " + monitor.x + " y " + monitor.y + " width " + monitor.width + " height " + monitor.height);
+    log("Workarea position x " + workArea.x + " y " + workArea.y + " width " + workArea.width + " height " + workArea.height);
     let wax = Math.max(wx - workArea.x, 0);
     let way = Math.max(wy - workArea.y, 0);
     let grid_element_width = Math.floor(workArea.width / nbCols);
@@ -810,20 +812,20 @@ function setInitialSelection() {
     let rdy = Math.min(Math.floor((way + wheight - 1) / grid_element_height), grid.rows - 1);
     log("wy + wheight " + (wy + wheight - workArea.y - 1) + " el_height " + grid_element_height + " max " + (nbRows - 1) + " res " + rdy);
     log("Initial tile selection is " + lux + ":" + luy + " - " + rdx + ":" + rdy);
-    
-    grid.elements[luy] [lux]._onButtonPress();     
-    grid.elements[rdy] [rdx]._onHoverChanged();    
+
+    grid.elements[luy] [lux]._onButtonPress();
+    grid.elements[rdy] [rdx]._onHoverChanged();
 
     let cX = delegate.currentElement.coordx;
     let cY = delegate.currentElement.coordy;
     let fX = delegate.first.coordx;
     let fY = delegate.first.coordy;
 
-    log("After initial selection first fX " + fX + " fY " + fY + " current cX " + cX + " cY " + cY);      
+    log("After initial selection first fX " + fX + " fY " + fY + " current cX " + cX + " cY " + cY);
 }
 
 function keyMoveResizeEvent(type, key) {
-    log("Got key event " + type + " " + key);  
+    log("Got key event " + type + " " + key);
     if (!focusMetaWindow) {
         return;
     }
@@ -832,7 +834,7 @@ function keyMoveResizeEvent(type, key) {
     let mkey = getMonitorKey(monitor);
     let grid = grids[mkey];
     let delegate = grid.elementsDelegate;
-    
+
     if(!delegate.currentElement) {
         log("Key event while no mouse activation - set current and second element");
         setInitialSelection();
@@ -849,68 +851,68 @@ function keyMoveResizeEvent(type, key) {
     let cY = delegate.currentElement.coordy;
     let fX = delegate.first.coordx;
     let fY = delegate.first.coordy;
-    
+
     log("Before move/resize first fX " + fX + " fY " + fY + " current cX " + cX + " cY " + cY);
     log("Grid cols " + nbCols + " rows " + nbRows);
-    if(type == 'move') {	 
+    if(type == 'move') {
         switch(key) {
             case 'right':
             if(fX < nbCols - 1 && cX < nbCols - 1) {
                 delegate.first = grid.elements [fY] [fX + 1];
-                grid.elements[cY] [cX + 1]._onHoverChanged(); 
+                grid.elements[cY] [cX + 1]._onHoverChanged();
             }
             break;
             case 'left':
             if(fX > 0 && cX > 0) {
                 delegate.first = grid.elements [fY] [fX - 1];
-                grid.elements[cY] [cX - 1]._onHoverChanged(); 
+                grid.elements[cY] [cX - 1]._onHoverChanged();
             }
             break;
             case 'up':
             if(fY > 0 && cY > 0) {
                 delegate.first = grid.elements [fY - 1] [fX];
-                grid.elements[cY - 1] [cX]._onHoverChanged(); 
+                grid.elements[cY - 1] [cX]._onHoverChanged();
             }
             break;
             case 'down':
             if(fY < nbRows - 1 && cY < nbRows - 1) {
                 delegate.first = grid.elements [fY + 1] [fX];
-                grid.elements[cY + 1] [cX]._onHoverChanged(); 
+                grid.elements[cY + 1] [cX]._onHoverChanged();
             }
             break;
-        }      
+        }
         } else {
         switch(key) {
             case 'right':
             if(cX < nbCols - 1) {
-                grid.elements[cY] [cX + 1]._onHoverChanged(); 
+                grid.elements[cY] [cX + 1]._onHoverChanged();
             }
             break;
             case 'left':
             if(cX > 0) {
-                grid.elements[cY] [cX - 1]._onHoverChanged(); 
+                grid.elements[cY] [cX - 1]._onHoverChanged();
             }
             break;
             case 'up':
             if(cY > 0 ) {
-                grid.elements[cY - 1] [cX]._onHoverChanged(); 
+                grid.elements[cY - 1] [cX]._onHoverChanged();
             }
             break;
             case 'down':
             if(cY < nbRows - 1) {
-                grid.elements[cY + 1] [cX]._onHoverChanged(); 
+                grid.elements[cY + 1] [cX]._onHoverChanged();
             }
             break;
         }
     }
-    
+
     cX = delegate.currentElement.coordx;
     cY = delegate.currentElement.coordy;
     fX = delegate.first.coordx;
     fY = delegate.first.coordy;
-    
+
     log("After move/resize first fX " + fX + " fY " + fY + " current cX " + cX + " cY " + cY);
-    
+
 }
 
 function presetResize(preset) {
@@ -926,9 +928,9 @@ function presetResize(preset) {
     }
 
     reset_window(window);
-    
+
     let preset_string = settings.get_string("resize" + preset);
-    log("Preset resize " + preset + "  is " + preset_string);  
+    log("Preset resize " + preset + "  is " + preset_string);
     let ps = preset_string.split(" ");
     if(ps.length != 3) {
         log("Bad preset " + preset + " settings " + preset_string);
@@ -937,19 +939,19 @@ function presetResize(preset) {
     let grid_format = parseTuple(ps[0], "x");
     let luc = parseTuple(ps[1], ":");
     let rdc = parseTuple(ps[2], ":");
-    log("Parsed " + grid_format.X + "x" + grid_format.Y + " " 
+    log("Parsed " + grid_format.X + "x" + grid_format.Y + " "
         + luc.X + ":" + luc.Y + " " + rdc.X + ":" + rdc.Y);
-    if  (  grid_format.X < 1 || luc.X < 0 || rdc.X < 0 
-        || grid_format.Y < 1 || luc.Y < 0 || rdc.Y < 0 
-        || grid_format.X <= luc.X || grid_format.X <= rdc.X 
-        || grid_format.Y <= luc.Y || grid_format.Y <= rdc.Y 
+    if  (  grid_format.X < 1 || luc.X < 0 || rdc.X < 0
+        || grid_format.Y < 1 || luc.Y < 0 || rdc.Y < 0
+        || grid_format.X <= luc.X || grid_format.X <= rdc.X
+        || grid_format.Y <= luc.Y || grid_format.Y <= rdc.Y
         || luc.X > rdc.X || luc.Y > rdc.Y) {
         log("Bad preset " + preset + " settings " + preset_string);
-        return;      
+        return;
     }
     log("Parsed preset " + preset + " " + grid_format.X + "x" + grid_format.Y +
         " " + luc.X + ":" + luc.Y + " " + rdc.X + ":" + rdc.Y);
-    
+
     let mind = window.get_monitor();
     let work_area = getWorkAreaByMonitorIdx(mind);
     let grid_element_width = Math.floor(work_area.width / grid_format.X);
@@ -958,8 +960,8 @@ function presetResize(preset) {
     let wy = work_area.y + luc.Y * grid_element_height + gridSettings[SETTINGS_WINDOW_MARGIN];
     let ww = (rdc.X + 1 - luc.X) * grid_element_width - 2 * gridSettings[SETTINGS_WINDOW_MARGIN];
     let wh = (rdc.Y + 1 - luc.Y) * grid_element_height- 2 * gridSettings[SETTINGS_WINDOW_MARGIN];
-    
-    log("Resize preset " + preset + " resizing to wx " + wx + " wy " + wy + " ww " + ww + " wh " + wh);    
+
+    log("Resize preset " + preset + " resizing to wx " + wx + " wy " + wy + " ww " + ww + " wh " + wh);
     window.move_resize_frame(true, wx, wy, ww, wh);
 }
 
@@ -1118,11 +1120,14 @@ AutoTileMainAndList.prototype = {
         let workArea = getWorkAreaByMonitor(monitor);
         let windows = getNotFocusedWindowsOfMonitor(monitor);
 
+        let mainWidth = getIntSetting(SETTINGS_MAIN_AREA_WIDTH)
+        let listWidth = getIntSetting(SETTINGS_LIST_AREA_WIDTH)
+
         move_resize_window_with_margins(
             focusMetaWindow,
             workArea.x,
             workArea.y,
-            workArea.width/2,
+            workArea.width * mainWidth / (mainWidth + listWidth),
             workArea.height);
 
         let winHeight = workArea.height/windows.length;
@@ -1138,9 +1143,9 @@ AutoTileMainAndList.prototype = {
 
             move_resize_window_with_margins(
                 metaWindow,
-                workArea.x + workArea.width/2,
+                workArea.x + workArea.width * mainWidth / (mainWidth + listWidth),
                 newOffset,
-                workArea.width/2,
+                workArea.width * listWidth / (mainWidth + listWidth),
                 winHeight
             );
             countWin++;
@@ -1374,7 +1379,7 @@ Grid.prototype = {
         this.rows = rows;
         this.title = title;
         this.cols = cols;
-	
+
         this.isEntered = false;
 
         let nbTotalSettings = 4;
@@ -1704,7 +1709,7 @@ GridElementDelegate.prototype = {
         }
     },
 
-    _hideArea: function() { 
+    _hideArea: function() {
         area.remove_style_pseudo_class('activate');
     },
 
@@ -1719,8 +1724,8 @@ GridElementDelegate.prototype = {
             }
 
             this.currentElement = gridElement;
-            this.currentElement._activate();	    
-            this._displayArea(gridElement,gridElement);	    
+            this.currentElement._activate();
+            this._displayArea(gridElement,gridElement);
         }
     },
 
