@@ -158,6 +158,30 @@ const GTileStatusButton = new Lang.Class({
     },
 
     _onButtonPress: function(actor, event) {
+        if (event.get_button() === Clutter.BUTTON_PRIMARY) {
+            let window = getFocusApp();
+            focusMetaWindow = window;
+            let monitorIdx = window.get_monitor();
+            let monitor = monitors[monitorIdx];
+            let key = getMonitorKey(monitor);
+            let grid = grids[key];
+            let action = new AutoTileMainAndList(grid);
+            action._onButtonPress();
+            return;
+        }
+
+        if (event.get_button() === Clutter.BUTTON_MIDDLE) {
+            let window = getFocusApp();
+            focusMetaWindow = window;
+            let monitorIdx = window.get_monitor();
+            let monitor = monitors[monitorIdx];
+            let key = getMonitorKey(monitor);
+            let grid = grids[key];
+            let action = new AutoTileTwoList(grid);
+            action._onButtonPress();
+            return;
+        }
+
         log("_onButtonPress Click Toggle Status on system panel");
         toggleTiling();
     },
