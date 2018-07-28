@@ -175,7 +175,7 @@ function basics_tab(notebook) {
     bs_grid.add(new Gtk.Label({ label: '<b><big>Grid</big></b>', use_markup: true, halign: Gtk.Align.START, margin_top: 8 }));
     add_text ("Grid sizes (like 6x4,8x6,21x11)", SETTINGS_GRID_SIZES      , bs_grid, settings, 30);
 
-    bs_grid.add(new Gtk.Label({ label: '<b><big>Auto Tile</big></b>', use_markup: true, halign: Gtk.Align.START, margin_top: 8 }));
+    bs_grid.add(new Gtk.Label({ label: '<b><big>Auto Tile Ratio</big></b>', use_markup: true, halign: Gtk.Align.START, margin_top: 8 }));
     add_int('Left area width', SETTINGS_MAIN_AREA_WIDTH, bs_grid, settings, 1, 100, 1, 10);
     add_int('Right area width', SETTINGS_LIST_AREA_WIDTH, bs_grid, settings, 1, 100, 1, 10);
 
